@@ -1,7 +1,7 @@
-From a61bf3ddf62a22aa4f70d61858f4f3cddb1fda44 Mon Sep 17 00:00:00 2001
+From fa36035a788add2d77b254ca4cebab5a820bd5b1 Mon Sep 17 00:00:00 2001
 From: Workers DevProd <workers-devprod@cloudflare.com>
 Date: Mon, 2 Oct 2023 18:13:34 +0100
-Subject: [PATCH 01/12] Support viewing files over the network
+Subject: [PATCH 01/13] Support viewing files over the network
 
 ---
  build                                    | 2 +-
