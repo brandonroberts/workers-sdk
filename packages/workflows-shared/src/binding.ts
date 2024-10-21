@@ -8,7 +8,7 @@ import type {
 } from "./engine";
 
 type Env = {
-	ENGINE: DurableObjectNamespace<Engine>;
+	MINIFLARE_OBJECT: DurableObjectNamespace<Engine>;
 };
 
 // this.env.WORKFLOW is WorkflowBinding
@@ -20,7 +20,7 @@ export class WorkflowBinding extends WorkerEntrypoint<Env> implements Workflow {
 		const stubId = this.env.ENGINE.idFromName(name);
 		const stub = this.env.ENGINE.get(stubId);
 
-		void stub.init(
+		await stub.init(
 			0, // accountId: number,
 			{} as DatabaseWorkflow, // workflow: DatabaseWorkflow,
 			{} as DatabaseVersion, // version: DatabaseVersion,

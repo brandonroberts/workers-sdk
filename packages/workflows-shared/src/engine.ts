@@ -21,6 +21,8 @@ import {
 } from "./lib/gracePeriodSemaphore";
 import { TimePriorityQueue } from "./lib/timePriorityQueue";
 
+console.log("ENGINE MODULE SCOPE");
+
 export interface Env {
 	USER_WORKFLOW: WorkflowEntrypoint;
 }
@@ -67,6 +69,8 @@ export class Engine extends DurableObject<Env> {
 	priorityQueue: TimePriorityQueue | undefined;
 
 	constructor(state: DurableObjectState, env: Env) {
+		console.log("\n\n\n\nENGINE\n\n\n\n");
+
 		super(state, env);
 
 		void this.ctx.blockConcurrencyWhile(async () => {
@@ -138,13 +142,17 @@ export class Engine extends DurableObject<Env> {
 
 	async userTriggeredTerminate() {}
 
-	async init(
+	async init() {
+		console.log("init");
+	}
+	async _init(
 		accountId: number,
 		workflow: DatabaseWorkflow,
 		version: DatabaseVersion,
 		instance: DatabaseInstance,
 		event: WorkflowEvent<unknown>
 	) {
+		console.log(1);
 		if (this.priorityQueue === undefined) {
 			this.priorityQueue = new TimePriorityQueue(
 				this.ctx,
@@ -158,12 +166,16 @@ export class Engine extends DurableObject<Env> {
 				}
 			);
 		}
+		console.log(2);
 		this.priorityQueue.popPastEntries();
+		console.log(3);
 		await this.priorityQueue.handleNextAlarm();
+		console.log(4);
 
 		if (this.isRunning) {
 			return;
 		}
+		console.log(5);
 
 		// We are not running and are possibly starting a new lifetime
 		this.accountId = accountId;
@@ -171,6 +183,7 @@ export class Engine extends DurableObject<Env> {
 		this.workflowName = workflow.name;
 
 		const status = await this.getStatus(accountId, instance.name);
+		console.log(6);
 		if (
 			[
 				InstanceStatus.Errored, // TODO (WOR-85): Remove this once upgrade story is done
@@ -178,10 +191,13 @@ export class Engine extends DurableObject<Env> {
 				InstanceStatus.Complete,
 			].includes(status)
 		) {
+			console.log(6.1);
 			return;
 		}
 
+		console.log(7);
 		if ((await this.ctx.storage.get(INSTANCE_METADATA)) == undefined) {
+			console.log(7.1);
 			const instanceMetadata: InstanceMetadata = {
 				accountId,
 				workflow,
@@ -210,6 +226,7 @@ export class Engine extends DurableObject<Env> {
 
 		// assert(accountMetadata, "Account metadata was undefined");
 
+		console.log(8);
 		const stubStep = new Context(this, this.ctx);
 
 		// let target = this.env.DISPATCHER.get(
@@ -262,6 +279,7 @@ export class Engine extends DurableObject<Env> {
 			// TODO: Trigger user script via binding
 			const target = this.env.USER_WORKFLOW;
 			// @ts-ignore TODO: fix do() overload definitions
+			console.log(9);
 			const result = await target.run(event, stubStep);
 			console.log("completed", result);
 			// Since this gets written to sql as a JSON string, this will need

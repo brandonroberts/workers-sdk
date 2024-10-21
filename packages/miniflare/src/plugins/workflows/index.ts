@@ -1,13 +1,16 @@
 import fs from "fs/promises";
+import { SharedBindings } from "miniflare:shared";
 import SCRIPT_WORKFLOWS_BINDING from "worker:workflows/binding";
 import { z } from "zod";
 import { Service } from "../../runtime";
 import { getUserServiceName } from "../core";
 import {
+	getMiniflareObjectBindings,
 	getPersistPath,
 	PersistenceSchema,
 	Plugin,
 	ProxyNodeBinding,
+	SERVICE_LOOPBACK,
 } from "../shared";
 
 export const WorkflowsOptionsSchema = z.object({
@@ -26,7 +29,7 @@ export const WorkflowsSharedOptionsSchema = z.object({
 });
 
 export const WORKFLOWS_PLUGIN_NAME = "workflows";
-export const WORKFLOWS_STORAGE_SERVICE_NAME = "workflows";
+export const WORKFLOWS_STORAGE_SERVICE_NAME = "workflows:storage";
 
 export const WORKFLOWS_PLUGIN: Plugin<
 	typeof WorkflowsOptionsSchema,
@@ -55,7 +58,7 @@ export const WORKFLOWS_PLUGIN: Plugin<
 		);
 	},
 
-	async getServices({ options, sharedOptions, tmpPath }) {
+	async getServices({ options, sharedOptions, tmpPath, unsafeStickyBlobs }) {
 		const persistPath = getPersistPath(
 			WORKFLOWS_PLUGIN_NAME,
 			tmpPath,
@@ -69,22 +72,34 @@ export const WORKFLOWS_PLUGIN: Plugin<
 
 		const services = Object.entries(options.workflows ?? {}).map<Service>(
 			([bindingName, workflow]) => {
+				const uniqueKey = `miniflare-workflows`;
+
 				const workflowsBinding: Service = {
 					name: `workflows:${workflow.name}`,
 					worker: {
 						compatibilityDate: "2024-10-18",
+						compatibilityFlags: ["experimental"],
 						modules: [
 							{
 								name: "workflows.mjs",
 								esModule: SCRIPT_WORKFLOWS_BINDING(),
 							},
 						],
-						durableObjectNamespaces: [{ className: "Engine" }],
+						durableObjectNamespaces: [
+							{
+								className: "Engine",
+								enableSql: true,
+								uniqueKey,
+								preventEviction: true,
+							},
+						],
 						durableObjectStorage: { localDisk: WORKFLOWS_STORAGE_SERVICE_NAME },
 						bindings: [
 							{
 								name: "ENGINE",
-								durableObjectNamespace: { className: "Engine" },
+								durableObjectNamespace: {
+									className: "Engine",
+								},
 							},
 							{
 								name: "USER_WORKFLOW",
@@ -93,6 +108,15 @@ export const WORKFLOWS_PLUGIN: Plugin<
 									entrypoint: workflow.className,
 								},
 							},
+							{
+								name: SharedBindings.MAYBE_SERVICE_BLOBS,
+								service: { name: WORKFLOWS_STORAGE_SERVICE_NAME },
+							},
+							{
+								name: SharedBindings.MAYBE_SERVICE_LOOPBACK,
+								service: { name: SERVICE_LOOPBACK },
+							},
+							...getMiniflareObjectBindings(unsafeStickyBlobs),
 						],
 					},
 				};
