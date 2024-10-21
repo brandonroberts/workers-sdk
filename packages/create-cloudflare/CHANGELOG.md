@@ -1,5 +1,17 @@
 # create-cloudflare
 
+## 2.30.1
+
+### Patch Changes
+
+- [#7016](https://github.com/cloudflare/workers-sdk/pull/7016) [`381d04f`](https://github.com/cloudflare/workers-sdk/commit/381d04f8c2f1e56c686e36d86c1fce7cdc4046dd) Thanks [@dependabot](https://github.com/apps/dependabot)! - chore: update dependencies of "create-cloudflare" package
+
+  The following dependency versions have been updated:
+
+  | Dependency | From   | To     |
+  | ---------- | ------ | ------ |
+  | create-vue | 3.10.4 | 3.11.1 |
+
 ## 2.30.0
 
 ### Minor Changes

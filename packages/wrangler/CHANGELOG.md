@@ -1,5 +1,45 @@
 # wrangler
 
+## 3.82.0
+
+### Minor Changes
+
+- [#7012](https://github.com/cloudflare/workers-sdk/pull/7012) [`244aa57`](https://github.com/cloudflare/workers-sdk/commit/244aa57a9f38b9dedbae6d4bb3949dd63840c82c) Thanks [@RamIdeas](https://github.com/RamIdeas)! - Add support for Workflow bindings (in deployments, not yet in local dev)
+
+  To bind to a workflow, add a `workflows` section in your wrangler.toml:
+
+  ```toml
+  [[workflows]]
+  binding = "WORKFLOW"
+  name = "my-workflow"
+  class_name = "MyDemoWorkflow"
+  ```
+
+  and export an entrypoint (e.g. `MyDemoWorkflow`) in your script:
+
+  ```typescript
+  import { WorkflowEntrypoint } from "cloudflare:workers";
+
+  export class MyDemoWorkflow extends WorkflowEntrypoint<Env, Params> {...}
+  ```
+
+- [#7015](https://github.com/cloudflare/workers-sdk/pull/7015) [`48152d6`](https://github.com/cloudflare/workers-sdk/commit/48152d69ee1440764b99e1d9b17656aaa1c1b20e) Thanks [@RamIdeas](https://github.com/RamIdeas)! - add `wrangler workflows ...` commands
+
+- [#6970](https://github.com/cloudflare/workers-sdk/pull/6970) [`a8ca700`](https://github.com/cloudflare/workers-sdk/commit/a8ca7005d09533f76b67c571859aa4c19519bec4) Thanks [@oliy](https://github.com/oliy)! - Add HTTP authentication options for Workers Pipelines
+
+### Patch Changes
+
+- [#7010](https://github.com/cloudflare/workers-sdk/pull/7010) [`1f6ff8b`](https://github.com/cloudflare/workers-sdk/commit/1f6ff8b696671cd1f7918c0549cc7e6660a71e5b) Thanks [@vicb](https://github.com/vicb)! - chore: update unenv dependency version
+
+- [#7039](https://github.com/cloudflare/workers-sdk/pull/7039) [`e44f496`](https://github.com/cloudflare/workers-sdk/commit/e44f496a84ba1c4c87abd5ea6302735cf84d525f) Thanks [@penalosa](https://github.com/penalosa)! - Only show dev registry connection status in local dev
+
+- [#7046](https://github.com/cloudflare/workers-sdk/pull/7046) [`f9d5fdb`](https://github.com/cloudflare/workers-sdk/commit/f9d5fdb0fdb4d0ed52264d64938d55eddd82ed8d) Thanks [@oliy](https://github.com/oliy)! - Minor change to 3rd party API shape for Workers Pipelines
+
+- [#6972](https://github.com/cloudflare/workers-sdk/pull/6972) [`c794935`](https://github.com/cloudflare/workers-sdk/commit/c794935143e98af1829682fb4f34dec6efa7077a) Thanks [@penalosa](https://github.com/penalosa)! - Add ` (local)` indicator to bindings using local data
+
+- Updated dependencies [[`809193e`](https://github.com/cloudflare/workers-sdk/commit/809193e05ad80c32086acf18646d0bd436cf2bfd)]:
+  - miniflare@3.20241018.0
+
 ## 3.81.0
 
 ### Minor Changes
